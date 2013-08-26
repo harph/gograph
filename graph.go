@@ -32,7 +32,16 @@ func newNode(key string, nv nodeValue) *node {
 }
 
 /*
-addArcTo add an directed arc to "nodeTo". Returns true if the arc is created,
+hasArcTo checks is there is an outgoing arc from the node to "nodeToKey".
+It returns true if it exists, otherwise it returns false.
+*/
+func (n *node) hasArcTo(nodeToKey string) bool {
+    _, ok := n.OutgoingArcs[nodeToKey]
+    return ok
+}
+
+/*
+addArcTo adds an directed arc to "nodeTo". Returns true if the arc is created,
 otherwide it returns false because the arc, already exists. It also returns
 false if the arc points to itself.
 */
@@ -42,14 +51,13 @@ func (n *node) addArcTo(nodeTo node) bool {
     if nodeToKey == nodeFromKey {
         return false
     }
-    _, ok := n.OutgoingArcs[nodeToKey]
-    if !ok {
+    hasArc := n.hasArcTo(nodeToKey)
+    if !hasArc {
         n.OutgoingArcs[nodeToKey] = nodeTo
         nodeTo.IncomingArcs[nodeFromKey] = *n
     }
-    return !ok
+    return !hasArc
 }
-
 
 // graph represents a graph data structure.
 type graph struct {
@@ -111,6 +119,19 @@ func (g *graph) AddArc(nodeFromValue, nodeToValue nodeValue) bool {
     nodeFrom := g.getNode(nodeFromValue)
     nodeTo := g.getNode(nodeToValue)
     return nodeFrom.addArcTo(*nodeTo)
+}
+
+/*
+HasArc check if there is an arc between "nodeFromValue" and "nodeToValue".
+It returns true if it exists, otherwise, false.
+*/
+func (g *graph) HasArc(nodeFromValue, nodeToValue nodeValue) bool {
+    nodeFrom := g.getNode(nodeFromValue)
+    if nodeFrom != nil {
+        nodeToKey := getNodeKey(nodeToValue)
+        return nodeFrom.hasArcTo(nodeToKey)
+    }
+    return false
 }
 
 /*

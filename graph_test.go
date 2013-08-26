@@ -91,7 +91,41 @@ func TestHasNode(t *testing.T) {
 
 // HasArc test.
 func TestHasArc(t *testing.T) {
-
+    graph := NewGraph()
+    dummyValue := new(testValue)
+    dummyArray := []int{1, 2, 3}
+    testCases := []struct{
+        inputNodeFrom testValue
+        inputNodeTo testValue
+        addArc bool
+        addEdge bool
+        output bool
+    }{
+        {"A", "B", true, false, true}, // Arc from A to B
+        {"A", "A", true, true, false},  // Arc and Edge from A to A
+        {"B", "B", false, false, false}, // No Arc or Edge from B to B
+        {"B", dummyValue, false, false, false}, // No Arc or Edge
+        {dummyArray, dummyValue, false, true, true}, // Edge from array-value
+        {nil, nil, false, false, false}, // No Arc/Edge and node doesn't exists
+    }
+    for _, testCase := range(testCases) {
+        nodeFrom := testCase.inputNodeFrom
+        nodeTo := testCase.inputNodeTo
+        if testCase.addArc {
+            graph.AddArc(nodeFrom, nodeTo)
+        }
+        if testCase.addEdge {
+            graph.AddEdge(nodeFrom, nodeTo)
+        }
+        hasArc := graph.HasArc(nodeFrom, nodeTo)
+        if hasArc != testCase.output {
+            t.Errorf(
+                "graph.HasArc(%#v, %#v) returned \"%t\" when \"%t\" " + 
+                "was expected",
+                nodeFrom, nodeTo, hasArc, testCase.output,
+            )
+        }
+    }
 }
 
 // HasEdge test.
