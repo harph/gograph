@@ -153,7 +153,15 @@ func (g *graph) AddEdge(node1Value, node2Value nodeValue) [2]bool{
     }
 }
 
-
-func (graph *graph) PrintGraph() {
-    fmt.Printf("%v\n", graph.nodeMap)
+/*
+HasEdge check if there is an edge between "node1Value" and "node2Value".
+It returns true if it exists, otherwise, false.
+*/
+func (g *graph) HasEdge(node1Value, node2Value nodeValue) bool {
+    node1 := g.getNode(node1Value)
+    node2 := g.getNode(node2Value)
+    if node1 != nil && node2 != nil {
+        return node1.hasArcTo(node2.key) && node2.hasArcTo(node1.key)
+    }
+    return false 
 }
