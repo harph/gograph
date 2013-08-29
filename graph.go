@@ -9,7 +9,7 @@ type nodeValue interface {}
 
 // getNodeKey returns a unique key associated to the node value.
 func getNodeKey(nv nodeValue) string {
-    return fmt.Sprintf("%b", nv)
+    return fmt.Sprintf("%#v", nv)
 }
 
 // node represents a graph node.
@@ -82,30 +82,33 @@ func (g *graph) HasNode(nv nodeValue) bool{
 }
 
 /*
-AddNode adds a node to the graph if it doesn't exist. If the node is added it
-returns true, otherwise it returns false indicating that the node has not been
-added because it already existed.
-*/
-func (g *graph) AddNode(nv nodeValue) bool {
-    ok := g.HasNode(nv)
-    if !ok {
-        key := getNodeKey(nv)
-        g.nodeMap[key] = *newNode(key, nv)
-    }
-    return !ok
-}
-
-/*
-getNode gets the node that match the "nodeValue". Returns the node if it
+GetNode gets the node that match the "nodeValue". Returns the node if it
 exists, otherwise it returns nil.
 */
-func (g *graph) getNode(nv nodeValue) *node {
+func (g *graph) GetNode(nv nodeValue) *node {
     nodeKey := getNodeKey(nv)
     n, ok := g.nodeMap[nodeKey]
     if ok {
         return &n
     }
     return nil
+}
+
+/*
+AddNode adds a node to the graph if it doesn't exist. If the node is added it
+returns true, otherwise it returns false indicating that the node has not been
+added because it already existed. It also returns the node.
+*/
+func (g *graph) AddNode(nv nodeValue) (bool, *node) {
+    n := g.GetNode(nv)
+    ok := false
+    if n == nil {
+        ok = true
+        key := getNodeKey(nv)
+        n = newNode(key, nv)
+        g.nodeMap[key] = *n
+    }
+    return ok, n
 }
 
 /*
@@ -116,8 +119,8 @@ existed or if "nodeFromValue" is equals to "nodeToValue".
 func (g *graph) AddArc(nodeFromValue, nodeToValue nodeValue) bool {
     g.AddNode(nodeFromValue)
     g.AddNode(nodeToValue)
-    nodeFrom := g.getNode(nodeFromValue)
-    nodeTo := g.getNode(nodeToValue)
+    nodeFrom := g.GetNode(nodeFromValue)
+    nodeTo := g.GetNode(nodeToValue)
     return nodeFrom.addArcTo(*nodeTo)
 }
 
@@ -126,7 +129,7 @@ HasArc check if there is an arc between "nodeFromValue" and "nodeToValue".
 It returns true if it exists, otherwise, false.
 */
 func (g *graph) HasArc(nodeFromValue, nodeToValue nodeValue) bool {
-    nodeFrom := g.getNode(nodeFromValue)
+    nodeFrom := g.GetNode(nodeFromValue)
     if nodeFrom != nil {
         nodeToKey := getNodeKey(nodeToValue)
         return nodeFrom.hasArcTo(nodeToKey)
@@ -145,8 +148,8 @@ It also returns {false, false} if both node values are the same.
 func (g *graph) AddEdge(node1Value, node2Value nodeValue) [2]bool{
     g.AddNode(node1Value)
     g.AddNode(node2Value)
-    node1 := g.getNode(node1Value)
-    node2 := g.getNode(node2Value)
+    node1 := g.GetNode(node1Value)
+    node2 := g.GetNode(node2Value)
     return [2]bool{
         node1.addArcTo(*node2),
         node2.addArcTo(*node1),
@@ -158,8 +161,8 @@ HasEdge check if there is an edge between "node1Value" and "node2Value".
 It returns true if it exists, otherwise, false.
 */
 func (g *graph) HasEdge(node1Value, node2Value nodeValue) bool {
-    node1 := g.getNode(node1Value)
-    node2 := g.getNode(node2Value)
+    node1 := g.GetNode(node1Value)
+    node2 := g.GetNode(node2Value)
     if node1 != nil && node2 != nil {
         return node1.hasArcTo(node2.key) && node2.hasArcTo(node1.key)
     }

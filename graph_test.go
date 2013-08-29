@@ -3,6 +3,7 @@ package gograph
 
 import (
     "testing"
+    "fmt"
 )
 
 
@@ -37,11 +38,18 @@ func TestAddNode(t *testing.T) {
         {dummyValue2, false}, // An existing struct
     }
     for _, testCase := range testCases {
-        added := graph.AddNode(testCase.input)
+        added, node := graph.AddNode(testCase.input)
         if added != testCase.output {
             t.Errorf(
                 "graph.AddNode(%#v) returned \"%t\" when \"%t\" was expected.\n",
                 testCase.input, added, testCase.output,
+            )
+        }
+        if fmt.Sprintf("%#v", node.Value) != fmt.Sprintf("%#v", testCase.input) {
+            t.Errorf(
+                "graph.AddNode(%#v) returned a node with value \"%#v\" that " +
+                "doesn't match the input value \"%#v\"",
+                testCase.input, node.Value, testCase.input,
             )
         }
     }
