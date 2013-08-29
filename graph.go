@@ -72,6 +72,23 @@ func NewGraph() *graph {
 }
 
 /*
+AddNode adds a node to the graph if it doesn't exist. If the node is added it
+returns true, otherwise it returns false indicating that the node has not been
+added because it already existed. It also returns the node.
+*/
+func (g *graph) AddNode(nv nodeValue) (bool, *node) {
+    n := g.GetNode(nv)
+    ok := false
+    if n == nil {
+        ok = true
+        key := getNodeKey(nv)
+        n = newNode(key, nv)
+        g.nodeMap[key] = *n
+    }
+    return ok, n
+}
+
+/*
 HasNode checks if the node "nv" exists in the graph. Returns true if so else
 returns false.
 */
@@ -92,23 +109,6 @@ func (g *graph) GetNode(nv nodeValue) *node {
         return &n
     }
     return nil
-}
-
-/*
-AddNode adds a node to the graph if it doesn't exist. If the node is added it
-returns true, otherwise it returns false indicating that the node has not been
-added because it already existed. It also returns the node.
-*/
-func (g *graph) AddNode(nv nodeValue) (bool, *node) {
-    n := g.GetNode(nv)
-    ok := false
-    if n == nil {
-        ok = true
-        key := getNodeKey(nv)
-        n = newNode(key, nv)
-        g.nodeMap[key] = *n
-    }
-    return ok, n
 }
 
 /*

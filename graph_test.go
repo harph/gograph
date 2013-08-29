@@ -97,6 +97,29 @@ func TestHasNode(t *testing.T) {
     }
 }
 
+func GetNodeTest(t *testing.T) {
+    graph := NewGraph()
+    dummyValue1 := new(testValue)
+    type dummyStruct struct{
+        X int
+        Y int
+    }
+    dummyValue2 := &dummyStruct{10, 20}
+    testCases := []testValue {
+        1, 3.14, "foo", nil, []int{1, 2 , 3}, dummyValue1, dummyValue2,
+    }
+    for _, testCase := range testCases {
+        _, node := graph.AddNode(testCase)
+        if fmt.Sprintf("%#v", node.Value) != fmt.Sprintf("%#v", testCase) {
+            t.Errorf(
+                "graph.GetNode(%#v) returned a node with value \"%#v\" that " +
+                "doesn't match the input value \"%#v\"",
+                testCase, node.Value, testCase,
+            )
+        }
+    }
+}
+
 // HasArc test.
 func TestHasArc(t *testing.T) {
     graph := NewGraph()
