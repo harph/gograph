@@ -120,85 +120,6 @@ func GetNodeTest(t *testing.T) {
     }
 }
 
-// HasArc test.
-func TestHasArc(t *testing.T) {
-    graph := NewGraph()
-    dummyValue := new(testValue)
-    dummyArray := []int{1, 2, 3}
-    testCases := []struct{
-        inputNodeFrom testValue
-        inputNodeTo testValue
-        addArc bool
-        addEdge bool
-        output bool
-    }{
-        {"A", "B", true, false, true}, // Arc from A to B
-        {"A", "A", true, true, false},  // Arc and Edge from A to A
-        {"B", "B", false, false, false}, // No Arc or Edge from B to B
-        {"B", dummyValue, false, false, false}, // No Arc or Edge
-        {dummyArray, dummyValue, false, true, true}, // Edge from array-value
-        {nil, nil, false, false, false}, // No Arc/Edge and node doesn't exists
-    }
-    for _, testCase := range(testCases) {
-        nodeFrom := testCase.inputNodeFrom
-        nodeTo := testCase.inputNodeTo
-        if testCase.addArc {
-            graph.AddArc(nodeFrom, nodeTo)
-        }
-        if testCase.addEdge {
-            graph.AddEdge(nodeFrom, nodeTo)
-        }
-        hasArc := graph.HasArc(nodeFrom, nodeTo)
-        if hasArc != testCase.output {
-            t.Errorf(
-                "graph.HasArc(%#v, %#v) returned \"%t\" when \"%t\" " + 
-                "was expected",
-                nodeFrom, nodeTo, hasArc, testCase.output,
-            )
-        }
-    }
-}
-
-// HasEdge test.
-func TestHasEdge(t *testing.T) {
-    graph := NewGraph()
-    dummyValue := new(testValue)
-    dummyArray := []int{1, 2, 3}
-    testCases := []struct{
-        inputNode1 testValue
-        inputNode2 testValue
-        addArc bool
-        addEdge bool
-        output bool
-    }{
-        {"A", "B", false, true, true}, // Arc from A to B
-        {"B", "A", false, false, true}, // Inverting the previous case
-        {"A", "A", true, true, false},  // Arc and Edge from A to A
-        {"B", "B", false, false, false}, // No Arc or Edge from B to B
-        {"B", dummyValue, true, false, false}, // Arc but no Edge
-        {dummyArray, dummyValue, false, true, true}, // Edge from array-value
-        {nil, nil, false, false, false}, // No Arc/Edge and node doesn't exists
-    }
-    for _, testCase := range(testCases) {
-        node1 := testCase.inputNode1
-        node2 := testCase.inputNode2
-        if testCase.addArc {
-            graph.AddArc(node1, node2)
-        }
-        if testCase.addEdge {
-            graph.AddEdge(node1, node2)
-        }
-        hasEdge := graph.HasEdge(node1, node2)
-        if hasEdge != testCase.output {
-            t.Errorf(
-                "graph.HasEdge(%#v, %#v) returned \"%t\" when \"%t\" " + 
-                "was expected",
-                node1, node2, hasEdge, testCase.output,
-            )
-        }
-    }
-}
-
 // AddArc test.
 func TestAddArc(t *testing.T) {
     graph := NewGraph()
@@ -250,6 +171,45 @@ func TestAddArc(t *testing.T) {
     }
 }
 
+// HasArc test.
+func TestHasArc(t *testing.T) {
+    graph := NewGraph()
+    dummyValue := new(testValue)
+    dummyArray := []int{1, 2, 3}
+    testCases := []struct{
+        inputNodeFrom testValue
+        inputNodeTo testValue
+        addArc bool
+        addEdge bool
+        output bool
+    }{
+        {"A", "B", true, false, true}, // Arc from A to B
+        {"A", "A", true, true, false},  // Arc and Edge from A to A
+        {"B", "B", false, false, false}, // No Arc or Edge from B to B
+        {"B", dummyValue, false, false, false}, // No Arc or Edge
+        {dummyArray, dummyValue, false, true, true}, // Edge from array-value
+        {nil, nil, false, false, false}, // No Arc/Edge and node doesn't exists
+    }
+    for _, testCase := range(testCases) {
+        nodeFrom := testCase.inputNodeFrom
+        nodeTo := testCase.inputNodeTo
+        if testCase.addArc {
+            graph.AddArc(nodeFrom, nodeTo)
+        }
+        if testCase.addEdge {
+            graph.AddEdge(nodeFrom, nodeTo)
+        }
+        hasArc := graph.HasArc(nodeFrom, nodeTo)
+        if hasArc != testCase.output {
+            t.Errorf(
+                "graph.HasArc(%#v, %#v) returned \"%t\" when \"%t\" " + 
+                "was expected",
+                nodeFrom, nodeTo, hasArc, testCase.output,
+            )
+        }
+    }
+}
+
 // AddEdge test.
 func TestAddEdge(t *testing.T) {
     graph := NewGraph()
@@ -290,6 +250,46 @@ func TestAddEdge(t *testing.T) {
                 "graph.addEdge(%#v, %#v) returned " +
                 "\"%v\" when \"%v\" was expected",
                 node1, node2, added, expectedOuput,
+            )
+        }
+    }
+}
+
+// HasEdge test.
+func TestHasEdge(t *testing.T) {
+    graph := NewGraph()
+    dummyValue := new(testValue)
+    dummyArray := []int{1, 2, 3}
+    testCases := []struct{
+        inputNode1 testValue
+        inputNode2 testValue
+        addArc bool
+        addEdge bool
+        output bool
+    }{
+        {"A", "B", false, true, true}, // Arc from A to B
+        {"B", "A", false, false, true}, // Inverting the previous case
+        {"A", "A", true, true, false},  // Arc and Edge from A to A
+        {"B", "B", false, false, false}, // No Arc or Edge from B to B
+        {"B", dummyValue, true, false, false}, // Arc but no Edge
+        {dummyArray, dummyValue, false, true, true}, // Edge from array-value
+        {nil, nil, false, false, false}, // No Arc/Edge and node doesn't exists
+    }
+    for _, testCase := range(testCases) {
+        node1 := testCase.inputNode1
+        node2 := testCase.inputNode2
+        if testCase.addArc {
+            graph.AddArc(node1, node2)
+        }
+        if testCase.addEdge {
+            graph.AddEdge(node1, node2)
+        }
+        hasEdge := graph.HasEdge(node1, node2)
+        if hasEdge != testCase.output {
+            t.Errorf(
+                "graph.HasEdge(%#v, %#v) returned \"%t\" when \"%t\" " + 
+                "was expected",
+                node1, node2, hasEdge, testCase.output,
             )
         }
     }
