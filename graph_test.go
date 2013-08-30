@@ -19,7 +19,7 @@ func TestAddNode(t *testing.T) {
         Y int
     }
     dummyValue2 := &dummyStruct{10, 20}
-    testCases := []struct {
+    testCases := []struct{
         input testValue
         output bool
     }{
@@ -55,6 +55,66 @@ func TestAddNode(t *testing.T) {
     }
 }
 
+// DeleteNode test.
+func TestDeleteNode(t *testing.T) {
+    graph := NewGraph()
+    dummyValue1 := new(testValue)
+    type dummyStruct struct{
+        X int
+        Y int
+    }
+    dummyValue2 := &dummyStruct{10, 20}
+    testCases := []struct{
+        input testValue
+        edges []testValue
+        addNode bool
+        output bool
+    }{
+        {"A", []testValue{"B", "C"}, true, true},
+        {3.14, []testValue{}, false, false},
+        {"C", []testValue{"foo", "bar"}, false, true},
+        {nil, []testValue{"B", dummyValue1}, true, true},
+        {[]int{1, 2 , 3}, []testValue{dummyValue1,}, true, true},
+        {dummyValue1, []testValue{}, false, true},
+        {dummyValue2, []testValue{}, true, true},
+    }
+    for _, testCase := range testCases {
+        nodeValue := testCase.input
+        if testCase.addNode {
+            graph.AddNode(nodeValue)
+        }
+        for _, nodeTo := range testCase.edges {
+            graph.AddEdge(nodeValue, nodeTo)
+        }
+        deleted := graph.DeleteNode(nodeValue)
+        if deleted != testCase.output {
+            t.Errorf(
+                "graph.DeleteNode(%#v) returned \"%t\" when \"%t\" was " +
+                "expected.",
+                testCase.input, deleted, testCase.output,
+            )
+        }
+        if graph.HasNode(testCase.input) {
+            t.Errorf(
+                "graph.HasNode(%#v) returned \"true\" when the node was " + 
+                "previously removed",
+                testCase.input,
+            )
+        }
+        for _, nodeTo := range testCase.edges {
+            if graph.HasEdge(nodeValue, nodeTo) ||
+                    graph.HasArc(nodeValue, nodeTo ) ||
+                    graph.HasArc(nodeTo, nodeValue) {
+                t.Errorf(
+                    "There is still an edge/arcs between %#v and %#v after " +
+                    "execute graph.DeleteNode(%#v)",
+                    nodeValue, nodeTo, nodeValue,
+                )
+            }
+        }
+    }
+}
+
 // HasNode test.
 func TestHasNode(t *testing.T) {
     graph := NewGraph();
@@ -71,7 +131,7 @@ func TestHasNode(t *testing.T) {
     graph.AddNode(nil);
     graph.AddNode(dummyValue1);
     graph.AddNode(dummyValue3);
-    testCases := []struct {
+    testCases := []struct{
         input testValue
         output bool
     }{
@@ -97,6 +157,7 @@ func TestHasNode(t *testing.T) {
     }
 }
 
+// GetNode Test
 func GetNodeTest(t *testing.T) {
     graph := NewGraph()
     dummyValue1 := new(testValue)

@@ -59,6 +59,41 @@ func (n *node) addArcTo(nodeTo node) bool {
     return !hasArc
 }
 
+/*
+DeleteIncomingArcs removes all the incoming arc connections references from the
+current node and from the incoming ones.
+*/
+func (n *node) DeleteIncomingArcs() {
+    for incomingArc, nodeFrom := range n.IncomingArcs {
+        // Delete the outgoing arc reference in nodeFrom
+        delete(nodeFrom.OutgoingArcs, n.key)
+        // Delete the incoming arc reference.
+        delete(n.IncomingArcs, incomingArc)
+    }
+}
+
+/*
+DeleteOutgoingArcs removes all the outgoing arc connection references from the
+current node and from the outgoing ones.
+*/
+func (n *node) DeleteOutgoingArcs() {
+    for outgoingArc, nodeTo := range n.OutgoingArcs {
+        // Delete the incoming arc reference in nodeTo
+        delete(nodeTo.IncomingArcs, n.key)
+        // Delete the outgoing arc reference.
+        delete(n.OutgoingArcs, outgoingArc)
+    }
+}
+
+/*
+DeleteAllArcs removes all the arcs (incoming and outgoing) references from the
+current node and from the inconmig and outgoing ones.
+*/
+func (n *node) DeleteAllArcs() {
+    n.DeleteIncomingArcs()
+    n.DeleteOutgoingArcs()
+}
+
 // graph represents a graph data structure.
 type graph struct {
     nodeMap map[string] node // Keeps track of the nodes
@@ -86,6 +121,22 @@ func (g *graph) AddNode(nv nodeValue) (bool, *node) {
         g.nodeMap[key] = *n
     }
     return ok, n
+}
+
+/*
+DeleteNode removes the node that contains that matches the nodeValue. It also
+removes the Arc/Edges to from the node to other nodes and viceversa. It
+returns true if the node ir removed, otherwise it returns false because the
+node does not exist.
+*/
+func (g *graph) DeleteNode(nv nodeValue) bool {
+    n := g.GetNode(nv)
+    if n != nil {
+        n.DeleteAllArcs()
+        delete(g.nodeMap, n.key)
+        return true
+    }
+    return false
 }
 
 /*
