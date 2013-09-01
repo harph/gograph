@@ -35,8 +35,8 @@ func newNode(key string, nv nodeValue) *node {
 hasArcTo checks is there is an outgoing arc from the node to "nodeToKey".
 It returns true if it exists, otherwise it returns false.
 */
-func (n *node) hasArcTo(nodeToKey string) bool {
-    _, ok := n.OutgoingArcs[nodeToKey]
+func (n *node) HasArcTo(nodeTo node) bool {
+    _, ok := n.OutgoingArcs[nodeTo.key]
     return ok
 }
 
@@ -51,7 +51,7 @@ func (n *node) addArcTo(nodeTo node) bool {
     if nodeToKey == nodeFromKey {
         return false
     }
-    hasArc := n.hasArcTo(nodeToKey)
+    hasArc := n.HasArcTo(nodeTo)
     if !hasArc {
         n.OutgoingArcs[nodeToKey] = nodeTo
         nodeTo.IncomingArcs[nodeFromKey] = *n
@@ -73,7 +73,7 @@ func (n *node) DeleteIncomingArcs() {
 }
 
 /*
-DeleteOutgoingArcs removes all the outgoing arc connection references from the
+DeleteOutgoingArcs deletes all the outgoing arc connection references from the
 current node and from the outgoing ones.
 */
 func (n *node) DeleteOutgoingArcs() {
@@ -86,12 +86,26 @@ func (n *node) DeleteOutgoingArcs() {
 }
 
 /*
-DeleteAllArcs removes all the arcs (incoming and outgoing) references from the
+DeleteAllArcs deletes all the arcs (incoming and outgoing) references from the
 current node and from the inconmig and outgoing ones.
 */
 func (n *node) DeleteAllArcs() {
     n.DeleteIncomingArcs()
     n.DeleteOutgoingArcs()
+}
+
+/*
+DeleteArcTo deletes the arc from the current node to the "nodeTo". It returns
+"true" is the arc is deleted, otherwise it returns false becase the arc didn't
+exists.
+*/
+func (n *node) DeleteArcTo(nodeTo node) bool {
+    _, ok := n.OutgoingArcs[nodeTo.key]
+    if ok {
+        delete(n.OutgoingArcs, nodeTo.key)
+        delete(nodeTo.IncomingArcs, n.key)
+    }
+    return ok
 }
 
 // graph represents a graph data structure.
@@ -124,7 +138,7 @@ func (g *graph) AddNode(nv nodeValue) (bool, *node) {
 }
 
 /*
-DeleteNode removes the node that contains that matches the nodeValue. It also
+DeleteNode deletes the node that contains that matches the nodeValue. It also
 removes the Arc/Edges to from the node to other nodes and viceversa. It
 returns true if the node ir removed, otherwise it returns false because the
 node does not exist.
@@ -181,9 +195,9 @@ It returns true if it exists, otherwise, false.
 */
 func (g *graph) HasArc(nodeFromValue, nodeToValue nodeValue) bool {
     nodeFrom := g.GetNode(nodeFromValue)
-    if nodeFrom != nil {
-        nodeToKey := getNodeKey(nodeToValue)
-        return nodeFrom.hasArcTo(nodeToKey)
+    nodeTo := g.GetNode(nodeToValue)
+    if nodeFrom != nil && nodeTo != nil {
+        return nodeFrom.HasArcTo(*nodeTo)
     }
     return false
 }
@@ -208,6 +222,23 @@ func (g *graph) AddEdge(node1Value, node2Value nodeValue) [2]bool{
 }
 
 /*
+DeleteEdge deletes the edge between the "node1Value" and "node2Value". Returns
+"true" if the edge is deleted, otherwise it returns "false" because it doesn't
+exist.
+*/
+func (g *graph) DeleteEdge(node1Value, node2Value nodeValue) bool {
+    node1 := g.GetNode(node1Value)
+    node2 := g.GetNode(node2Value)
+    if node1 != nil && node2 != nil &&
+            node1.HasArcTo(*node2) && node2.HasArcTo(*node1) {
+        node1.DeleteArcTo(*node2)
+        node2.DeleteArcTo(*node1)
+        return true
+    }
+    return false
+}
+
+/*
 HasEdge check if there is an edge between "node1Value" and "node2Value".
 It returns true if it exists, otherwise, false.
 */
@@ -215,7 +246,7 @@ func (g *graph) HasEdge(node1Value, node2Value nodeValue) bool {
     node1 := g.GetNode(node1Value)
     node2 := g.GetNode(node2Value)
     if node1 != nil && node2 != nil {
-        return node1.hasArcTo(node2.key) && node2.hasArcTo(node1.key)
+        return node1.HasArcTo(*node2) && node2.HasArcTo(*node1)
     }
-    return false 
+    return false
 }

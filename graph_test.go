@@ -232,6 +232,11 @@ func TestAddArc(t *testing.T) {
     }
 }
 
+// DeleteArc test.
+func TestDeleteArc(t *testing.T) {
+
+}
+
 // HasArc test.
 func TestHasArc(t *testing.T) {
     graph := NewGraph()
@@ -311,6 +316,44 @@ func TestAddEdge(t *testing.T) {
                 "graph.addEdge(%#v, %#v) returned " +
                 "\"%v\" when \"%v\" was expected",
                 node1, node2, added, expectedOuput,
+            )
+        }
+    }
+}
+
+// DeleteEdge test.
+func TestDeleteEdge(t *testing.T) {
+    graph := NewGraph()
+    type dummyStruct struct{
+        X int
+        Y int
+    }
+    dummyValue := new(testValue)
+    dummyArray := []int{1, 2, 3}
+    testCases := []struct{
+        inputNode1 testValue
+        inputNode2 testValue
+        addEdge bool
+        output bool
+    }{
+        {"A", "B", true, true},
+        {"B", "A", false, false},
+        {"A", dummyArray, false, false},
+        {dummyValue, dummyArray, true, true},
+        {nil, dummyArray, true, true},
+    }
+    for _, testCase := range testCases {
+        node1 := testCase.inputNode1
+        node2 := testCase.inputNode2
+        if testCase.addEdge {
+            graph.AddEdge(node1, node2)
+        }
+        deleted := graph.DeleteEdge(node1, node2)
+        if deleted != testCase.output {
+            t.Errorf(
+                "graph.DeleteEdge(%#v, %#v) returned \"%t\" when \"%t\" was " +
+                "expected",
+                node1, node2, deleted, testCase.output,
             )
         }
     }
