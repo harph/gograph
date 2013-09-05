@@ -234,7 +234,40 @@ func TestAddArc(t *testing.T) {
 
 // DeleteArc test.
 func TestDeleteArc(t *testing.T) {
-
+    graph := NewGraph()
+    type dummyStruct struct{
+        X int
+        Y int
+    }
+    dummyValue := new(testValue)
+    dummyArray := []int{1, 2, 3}
+    testCases := []struct{
+        inputNode1 testValue
+        inputNode2 testValue
+        addArc bool
+        output bool
+    }{
+        {"A", "B", true, true},
+        {"B", "A", false, false},
+        {"A", dummyArray, false, false},
+        {dummyValue, dummyArray, true, true},
+        {nil, dummyArray, true, true},
+    }
+    for _, testCase := range testCases {
+        node1 := testCase.inputNode1
+        node2 := testCase.inputNode2
+        if testCase.addArc {
+            graph.AddArc(node1, node2)
+        }
+        deleted := graph.DeleteArc(node1, node2)
+        if deleted != testCase.output {
+            t.Errorf(
+                "graph.DeleteArc(%#v, %#v) returned \"%t\" when \"%t\" was " +
+                "expected",
+                node1, node2, deleted, testCase.output,
+            )
+        }
+    }
 }
 
 // HasArc test.

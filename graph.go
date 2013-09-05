@@ -190,6 +190,20 @@ func (g *graph) AddArc(nodeFromValue, nodeToValue nodeValue) bool {
 }
 
 /*
+DeleteArc deletes the arc between the "node1Value" and "node2Value". It returns
+"true" if the arc is deleted, otherwise it returns "false" because it doesn't
+exist.
+*/
+func (g *graph) DeleteArc(node1Value, node2Value nodeValue) bool {
+    node1 := g.GetNode(node1Value)
+    node2 := g.GetNode(node2Value)
+    if node1 != nil && node2 != nil {
+        return node1.DeleteArcTo(*node2)
+    }
+    return false
+}
+
+/*
 HasArc check if there is an arc between "nodeFromValue" and "nodeToValue".
 It returns true if it exists, otherwise, false.
 */
@@ -222,9 +236,9 @@ func (g *graph) AddEdge(node1Value, node2Value nodeValue) [2]bool{
 }
 
 /*
-DeleteEdge deletes the edge between the "node1Value" and "node2Value". Returns
-"true" if the edge is deleted, otherwise it returns "false" because it doesn't
-exist.
+DeleteEdge deletes the edge between the "node1Value" and "node2Value". It
+returns "true" if the edge is deleted, otherwise it returns "false" because it
+doesn't exist.
 */
 func (g *graph) DeleteEdge(node1Value, node2Value nodeValue) bool {
     node1 := g.GetNode(node1Value)
